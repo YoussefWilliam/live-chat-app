@@ -1,11 +1,11 @@
 import React from "react";
 
-interface ButtonProps {
+interface IButtonProps {
   handleOnClick: () => void;
   disabled: boolean;
   text: string;
 }
-const Button: React.FC<ButtonProps> = ({ handleOnClick, disabled, text }) => {
+const Button: React.FC<IButtonProps> = ({ handleOnClick, disabled, text }) => {
   return (
     <div className="flex space-x-2 justify-center">
       <button
