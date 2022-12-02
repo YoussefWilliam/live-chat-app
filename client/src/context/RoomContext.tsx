@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import socketIOClient from "socket.io-client";
 import Peer from "peerjs";
 import { v4 as uuidV4 } from "uuid";
-import { peerReducer } from "./peerReducer";
-import { addPeerAction, removePeerAction } from "./peerActions";
+import { peerReducer } from "../reducers/peerReducer";
+import { addPeerAction, removePeerAction } from "../reducers/peerActions";
+import { IMessage } from "../types/chat";
+import { chatReducer } from "../reducers/chatReducer";
+import { addHistoryAction, addMessageAction } from "../reducers/chatActions";
 
 const WEB_SOCKET = "http://localhost:8080";
 
@@ -16,14 +19,15 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   const navigate = useNavigate();
   const [currentPeer, setCurrentPeer] = useState<Peer>();
   const [stream, setStream] = useState<MediaStream>();
-  const [peers, dispatch] = useReducer(peerReducer, {});
+  const [peers, peerDispatch] = useReducer(peerReducer, {});
+  const [chat, chatDispatch] = useReducer(chatReducer, { messages: [] });
+  const [roomId, setRoomId] = useState<string>("");
 
   const handleEnterRoom = ({ roomId }: { roomId: string }) => {
     navigate(`/room/${roomId}`);
-    console.log("here is my id:::", roomId);
   };
 
-  const getUsers = ({
+  const handleGetUsers = ({
     roomId,
     participants,
   }: {
@@ -33,8 +37,28 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     console.log({ participants });
   };
 
-  const removePeer = (peerId: string) => {
-    dispatch(removePeerAction(peerId));
+  const handleRemovePeers = (peerId: string) => {
+    peerDispatch(removePeerAction(peerId));
+  };
+
+  const sendMessage = (message: string) => {
+    const messageData: IMessage = {
+      content: message,
+      author: currentPeer?.id,
+      timestamp: new Date().getTime().toString(),
+    };
+
+    chatDispatch(addMessageAction(messageData));
+    webSocketClient.emit("send-message", roomId, messageData);
+  };
+
+  const handleAddMessage = (message: IMessage) => {
+    console.log({ message });
+    chatDispatch(addMessageAction(message));
+  };
+
+  const handleMessageHistory = (messages: Array<IMessage>) => {
+    chatDispatch(addHistoryAction(messages));
   };
 
   useEffect(() => {
@@ -53,8 +77,20 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     }
 
     webSocketClient.on("room-created", handleEnterRoom);
-    webSocketClient.on("get-users", getUsers);
-    webSocketClient.on("user-disconnected", removePeer);
+    webSocketClient.on("get-users", handleGetUsers);
+    webSocketClient.on("user-disconnected", handleRemovePeers);
+    webSocketClient.on("add-message", handleAddMessage);
+    webSocketClient.on("get-messages", (messages) =>
+      handleMessageHistory(messages)
+    );
+
+    return () => {
+      webSocketClient.off("room-created");
+      webSocketClient.off("get-users");
+      webSocketClient.off("user-disconnected");
+      webSocketClient.off("user-joined");
+      webSocketClient.off("add-message");
+    };
   }, []);
 
   useEffect(() => {
@@ -65,7 +101,7 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     webSocketClient.on("user-joined", ({ peerId }) => {
       const call = currentPeer.call(peerId, stream);
       call.on("stream", (peerStream) => {
-        dispatch(addPeerAction(peerId, peerStream));
+        peerDispatch(addPeerAction(peerId, peerStream));
       });
     });
 
@@ -73,16 +109,22 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     currentPeer.on("call", (call) => {
       call.answer(stream);
       call.on("stream", (peerStream) => {
-        dispatch(addPeerAction(call.peer, peerStream));
+        peerDispatch(addPeerAction(call.peer, peerStream));
       });
     });
   }, [currentPeer, stream]);
 
-  console.log({ peers });
-
   return (
     <RoomContext.Provider
-      value={{ webSocketClient, currentPeer, stream, peers }}
+      value={{
+        webSocketClient,
+        currentPeer,
+        stream,
+        peers,
+        setRoomId,
+        sendMessage,
+        chat,
+      }}
     >
       {children}
     </RoomContext.Provider>
