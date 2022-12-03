@@ -16,6 +16,7 @@ export const roomHandler = (socket: Socket) => {
 
   const joinRoom = ({ roomId, peerId }: IRoomParams) => {
     if (!rooms[roomId]) rooms[roomId] = [];
+    if (!chats[roomId]) chats[roomId] = [];
     socket.emit("get-messages", chats[roomId]);
     console.log(`👀 User ${peerId} joined room ${roomId} 👀`);
     rooms[roomId].push(peerId);
