@@ -4,10 +4,14 @@ import ChatScreen from "../components/Chat/ChatScreen";
 import VideoPlayer from "../components/VideoPlayer";
 import { PeerState } from "../reducers/peerReducer";
 import { RoomContext } from "../context/RoomContext";
+import UserName from "../components/UserName";
+import { UserContext } from "../context/UserContext";
 const Room = () => {
   const { id: roomId } = useParams();
+  const { userName } = useContext(UserContext);
   const { webSocketClient, currentPeer, stream, peers, setRoomId } =
     useContext(RoomContext);
+  console.log("🚀 ~ file: Room.tsx:13 ~ Room ~ peers", peers);
 
   useEffect(() => {
     if (currentPeer) {
@@ -27,10 +31,16 @@ const Room = () => {
       </div>
       <div className="flex grow">
         <div className="grow w-2/3 grid gap-3 grid-cols-3">
-          <VideoPlayer stream={stream} />
+          <div>
+            <VideoPlayer stream={stream} />
+            <UserName name={userName} isMeTheSender={true} />
+          </div>
 
           {Object.values(peers as PeerState).map((peer) => (
-            <VideoPlayer stream={peer.stream} />
+            <div>
+              <VideoPlayer stream={peer.stream} />
+              <UserName name={peer.userName} isMeTheSender={false} />
+            </div>
           ))}
         </div>
         <div className="grow w-1/3 border-l-2 pb-28">

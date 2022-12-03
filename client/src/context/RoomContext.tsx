@@ -10,7 +10,11 @@ import socketIOClient from "socket.io-client";
 import Peer from "peerjs";
 import { v4 as uuidV4 } from "uuid";
 import { peerReducer } from "../reducers/peerReducer";
-import { addPeerAction, removePeerAction } from "../reducers/peerActions";
+import {
+  addPeerAction,
+  addPeerNameAction,
+  removePeerAction,
+} from "../reducers/peerActions";
 import { IMessage } from "../types/chat";
 import { chatReducer } from "../reducers/chatReducer";
 import { addHistoryAction, addMessageAction } from "../reducers/chatActions";
@@ -25,7 +29,7 @@ const webSocketClient = socketIOClient(WEB_SOCKET);
 export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   const navigate = useNavigate();
   const [currentPeer, setCurrentPeer] = useState<Peer>();
-  const { userId } = useContext(UserContext);
+  const { userId, userName } = useContext(UserContext);
   const [stream, setStream] = useState<MediaStream>();
   const [peers, peerDispatch] = useReducer(peerReducer, {});
   const [chat, chatDispatch] = useReducer(chatReducer, { messages: [] });
@@ -108,21 +112,32 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     if (!stream) return;
 
     // Initiaiting the call by sending our stream.
-    webSocketClient.on("user-joined", ({ peerId }) => {
-      const call = currentPeer.call(peerId, stream);
+    webSocketClient.on("user-joined", ({ peerId, userName: name }) => {
+      const call = currentPeer.call(peerId, stream, {
+        metadata: {
+          userName,
+        },
+      });
       call.on("stream", (peerStream) => {
         peerDispatch(addPeerAction(peerId, peerStream));
       });
+      peerDispatch(addPeerNameAction(peerId, name));
     });
 
     // Accepting the call by receiving other streams.
     currentPeer.on("call", (call) => {
+      const { userName } = call.metadata;
+      peerDispatch(addPeerNameAction(call.peer, userName));
       call.answer(stream);
       call.on("stream", (peerStream) => {
         peerDispatch(addPeerAction(call.peer, peerStream));
       });
     });
-  }, [currentPeer, stream]);
+
+    return () => {
+      webSocketClient.off("user-joined");
+    };
+  }, [currentPeer, stream, userName]);
 
   return (
     <RoomContext.Provider

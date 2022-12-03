@@ -15,7 +15,13 @@ export const UserContext = createContext<UserValue>({
 
 export const UserProvider: React.FC<any> = ({ children }) => {
   const [userId] = useState(localStorage.getItem("userId") || uuidV4());
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState(
+    localStorage.getItem("userName") || ""
+  );
+
+  useEffect(() => {
+    localStorage.setItem("userName", userName);
+  }, [userName]);
 
   useEffect(() => {
     localStorage.setItem("userId", userId);
