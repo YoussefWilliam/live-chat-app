@@ -1,13 +1,24 @@
-import React, { createContext, useEffect, useState, useReducer } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useState,
+  useReducer,
+  useContext,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import socketIOClient from "socket.io-client";
 import Peer from "peerjs";
 import { v4 as uuidV4 } from "uuid";
 import { peerReducer } from "../reducers/peerReducer";
-import { addPeerAction, removePeerAction } from "../reducers/peerActions";
+import {
+  addPeerAction,
+  addPeerNameAction,
+  removePeerAction,
+} from "../reducers/peerActions";
 import { IMessage } from "../types/chat";
 import { chatReducer } from "../reducers/chatReducer";
 import { addHistoryAction, addMessageAction } from "../reducers/chatActions";
+import { UserContext } from "./UserContext";
 
 const WEB_SOCKET = "http://localhost:8080";
 
@@ -18,6 +29,7 @@ const webSocketClient = socketIOClient(WEB_SOCKET);
 export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   const navigate = useNavigate();
   const [currentPeer, setCurrentPeer] = useState<Peer>();
+  const { userId, userName } = useContext(UserContext);
   const [stream, setStream] = useState<MediaStream>();
   const [peers, peerDispatch] = useReducer(peerReducer, {});
   const [chat, chatDispatch] = useReducer(chatReducer, { messages: [] });
@@ -28,10 +40,8 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   };
 
   const handleGetUsers = ({
-    roomId,
     participants,
   }: {
-    roomId: string;
     participants: Array<string>;
   }) => {
     console.log({ participants });
@@ -44,7 +54,7 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   const sendMessage = (message: string) => {
     const messageData: IMessage = {
       content: message,
-      author: currentPeer?.id,
+      author: userId,
       timestamp: new Date().getTime().toString(),
     };
 
@@ -61,10 +71,14 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     chatDispatch(addHistoryAction(messages));
   };
 
+  useEffect(() => {}, []);
+
   useEffect(() => {
-    const currentPeerId = uuidV4();
-    const peer = new Peer(currentPeerId);
+    const randomPeerId = uuidV4();
+    const currentId = localStorage.getItem("userId") || randomPeerId;
+    const peer = new Peer(randomPeerId);
     setCurrentPeer(peer);
+    localStorage.setItem("userId", currentId);
 
     try {
       navigator.mediaDevices
@@ -98,8 +112,13 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     if (!stream) return;
 
     // Initiaiting the call by sending our stream.
-    webSocketClient.on("user-joined", ({ peerId }) => {
-      const call = currentPeer.call(peerId, stream);
+    webSocketClient.on("user-joined", ({ peerId, userName: name }) => {
+      peerDispatch(addPeerNameAction(peerId, name));
+      const call = currentPeer.call(peerId, stream, {
+        metadata: {
+          userName,
+        },
+      });
       call.on("stream", (peerStream) => {
         peerDispatch(addPeerAction(peerId, peerStream));
       });
@@ -107,12 +126,14 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
 
     // Accepting the call by receiving other streams.
     currentPeer.on("call", (call) => {
+      const { userName: peerUserName } = call.metadata;
+      peerDispatch(addPeerNameAction(call.peer, peerUserName));
       call.answer(stream);
       call.on("stream", (peerStream) => {
         peerDispatch(addPeerAction(call.peer, peerStream));
       });
     });
-  }, [currentPeer, stream]);
+  }, [currentPeer, stream, userName]);
 
   return (
     <RoomContext.Provider

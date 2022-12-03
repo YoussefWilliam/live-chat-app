@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
-import { RoomContext } from "../../context/RoomContext";
 import { IMessage } from "../../types/chat";
 import cx from "classnames";
+import { UserContext } from "../../context/UserContext";
 
 const ChatBubble: React.FC<{ message: IMessage }> = ({ message }) => {
-  const { currentPeer } = useContext(RoomContext);
-  const isMeTheSender = currentPeer?.id === message.author;
+  const { userId } = useContext(UserContext);
+  const isMeTheSender = userId === message.author;
+
   return (
     <div
       className={cx(

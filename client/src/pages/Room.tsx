@@ -4,16 +4,24 @@ import ChatScreen from "../components/Chat/ChatScreen";
 import VideoPlayer from "../components/VideoPlayer";
 import { PeerState } from "../reducers/peerReducer";
 import { RoomContext } from "../context/RoomContext";
+import { UserContext } from "../context/UserContext";
 const Room = () => {
   const { id: roomId } = useParams();
-  const { webSocketClient, currentPeer, stream, peers, setRoomId } =
-    useContext(RoomContext);
+  const { webSocketClient, stream, peers, setRoomId } = useContext(RoomContext);
+
+  const { userName, userId } = useContext(UserContext);
 
   useEffect(() => {
-    if (currentPeer) {
-      webSocketClient.emit("join-room", { roomId, peerId: currentPeer._id });
+    if (stream) {
+      webSocketClient.emit("join-room", {
+        roomId,
+        peerId: userId,
+        userName,
+      });
     }
-  }, [roomId, currentPeer, webSocketClient]);
+  }, [roomId, userId, stream, userName, webSocketClient]);
+
+  console.log("peers", peers);
 
   useEffect(() => {
     setRoomId(roomId || "");
@@ -38,18 +46,6 @@ const Room = () => {
         </div>
       </div>
     </div>
-    // <div className="">
-    //   <div className="grid grid-cols-12">
-    //     <div className="col-span-9 p-2">
-    //       <div className="grid grid-cols-3 gap4">
-
-    //       </div>
-    //     </div>
-    //     <div className="col-span-3 border-l-2 overflow-y-auto">
-    //       <ChatScreen />
-    //     </div>
-    //   </div>
-    // </div>
   );
 };
 
