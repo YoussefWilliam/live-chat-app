@@ -2,9 +2,10 @@ import React, { useContext, useState } from "react";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import { RoomContext } from "../context/RoomContext";
+import { UserContext } from "../context/UserContext";
 
 const Home = () => {
-  const [userName, setUserName] = useState<string>();
+  const { userName, setUserName } = useContext(UserContext);
   const [roomIdInput, setRoomIdInput] = useState<string>("");
   const { webSocketClient } = useContext(RoomContext);
   const navigate = useNavigate();
@@ -73,17 +74,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {/* <div classNameNameName="flex flex-col items-center justify-center ">
-        <h1 classNameName="text-2xl">Welcome to Live-Chat app</h1>
-        <div classNameName="py-3">Please add your name</div>
-        <input classNameName="border rounded p-2" placeholder="name" />
-      </div>
-      <div classNameName="flex flex-row items-center justify-between">
-        <CreateRoomButton />
-        <button classNameName="rounded border p-4 hover:bg-slate-600">
-          Join a call
-        </button>
-      </div> */}
     </>
   );
 };

@@ -1,4 +1,10 @@
-import React, { createContext, useEffect, useState, useReducer } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useState,
+  useReducer,
+  useContext,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import socketIOClient from "socket.io-client";
 import Peer from "peerjs";
@@ -8,6 +14,7 @@ import { addPeerAction, removePeerAction } from "../reducers/peerActions";
 import { IMessage } from "../types/chat";
 import { chatReducer } from "../reducers/chatReducer";
 import { addHistoryAction, addMessageAction } from "../reducers/chatActions";
+import { UserContext } from "./UserContext";
 
 const WEB_SOCKET = "http://localhost:8080";
 
@@ -18,6 +25,7 @@ const webSocketClient = socketIOClient(WEB_SOCKET);
 export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   const navigate = useNavigate();
   const [currentPeer, setCurrentPeer] = useState<Peer>();
+  const { userId } = useContext(UserContext);
   const [stream, setStream] = useState<MediaStream>();
   const [peers, peerDispatch] = useReducer(peerReducer, {});
   const [chat, chatDispatch] = useReducer(chatReducer, { messages: [] });
@@ -44,7 +52,7 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   const sendMessage = (message: string) => {
     const messageData: IMessage = {
       content: message,
-      author: currentPeer?.id,
+      author: userId,
       timestamp: new Date().getTime().toString(),
     };
 
@@ -62,9 +70,11 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   };
 
   useEffect(() => {
-    const currentPeerId = uuidV4();
-    const peer = new Peer(currentPeerId);
+    const randomPeerId = uuidV4();
+    const currentId = localStorage.getItem("userId") || randomPeerId;
+    const peer = new Peer(randomPeerId);
     setCurrentPeer(peer);
+    localStorage.setItem("userId", currentId);
 
     try {
       navigator.mediaDevices

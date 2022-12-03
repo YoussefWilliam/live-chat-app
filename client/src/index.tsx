@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { RoomProvider } from "../src/context/RoomContext";
 import Home from "./pages/Home";
 import Room from "./pages/Room";
+import { UserProvider } from "./context/UserContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -13,12 +14,14 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <RoomProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/room/:id" element={<Room />} />
-        </Routes>
-      </RoomProvider>
+      <UserProvider>
+        <RoomProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/room/:id" element={<Room />} />
+          </Routes>
+        </RoomProvider>
+      </UserProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

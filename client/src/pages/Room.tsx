@@ -38,18 +38,6 @@ const Room = () => {
         </div>
       </div>
     </div>
-    // <div className="">
-    //   <div className="grid grid-cols-12">
-    //     <div className="col-span-9 p-2">
-    //       <div className="grid grid-cols-3 gap4">
-
-    //       </div>
-    //     </div>
-    //     <div className="col-span-3 border-l-2 overflow-y-auto">
-    //       <ChatScreen />
-    //     </div>
-    //   </div>
-    // </div>
   );
 };
 
