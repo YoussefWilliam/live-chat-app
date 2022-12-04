@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { RoomContext } from "../../context/RoomContext";
-import Button from "../Button";
 import SendIcon from "./SendIcon";
 
 const ChatInput: React.FC = () => {
