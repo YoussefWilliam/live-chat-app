@@ -57,7 +57,13 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     const messageData: IMessage = {
       content: message,
       author: userId,
-      timestamp: new Date().getTime().toString(),
+      name: userName,
+      timestamp: new Date()
+        .toTimeString()
+        .split(" ")[0]
+        .split(":")
+        .slice(0, 2)
+        .join(":"),
     };
 
     chatDispatch(addMessageAction(messageData));

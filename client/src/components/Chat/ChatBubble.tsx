@@ -9,11 +9,12 @@ const ChatBubble: React.FC<{ message: IMessage }> = ({ message }) => {
   return (
     <div
       className={cx(
-        "m-2 flex pl-10",
-        isMeTheSender ? "justify-end" : "justify-start"
+        "m-2 flex",
+        isMeTheSender ? "justify-end pr-2" : "justify-start pl-2"
       )}
     >
       <div>
+        {message.name}
         <div
           className={cx(
             "p-3",
@@ -24,7 +25,9 @@ const ChatBubble: React.FC<{ message: IMessage }> = ({ message }) => {
         >
           <p className="text-sm">{message.content}</p>
         </div>
-        <span className="text-xs leading-none text-gray-300">2 mins ago.</span>
+        <span className="text-xs leading-none text-gray-300">
+          {message.timestamp}
+        </span>
       </div>
     </div>
   );

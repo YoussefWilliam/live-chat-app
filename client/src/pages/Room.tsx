@@ -11,7 +11,6 @@ const Room = () => {
   const { userName } = useContext(UserContext);
   const { webSocketClient, currentPeer, stream, peers, setRoomId } =
     useContext(RoomContext);
-  console.log("🚀 ~ file: Room.tsx:13 ~ Room ~ peers", peers);
 
   useEffect(() => {
     if (currentPeer) {
@@ -29,7 +28,7 @@ const Room = () => {
         <h1 className="text-xl font-bold mt-0 mb-6">🚀Welcome to the room🚀</h1>
         <h3 className="text-white font-bold">{roomId}</h3>
       </div>
-      <div className="flex grow">
+      <div className="flex grow max-h-[800px]">
         <div className="grow w-2/3 grid gap-3 grid-cols-3">
           <div>
             <VideoPlayer stream={stream} />
@@ -43,7 +42,7 @@ const Room = () => {
             </div>
           ))}
         </div>
-        <div className="grow w-1/3 border-l-2 pb-28">
+        <div className="grow w-1/3 border-l h-full">
           <ChatScreen />
         </div>
       </div>
