@@ -6,17 +6,18 @@ import { PeerState } from "../reducers/peerReducer";
 import { RoomContext } from "../context/RoomContext";
 import UserName from "../components/UserName";
 import { UserContext } from "../context/UserContext";
+import { webSocketClient } from "../webSocketClient";
+
 const Room = () => {
   const { id: roomId } = useParams();
   const { userName } = useContext(UserContext);
-  const { webSocketClient, currentPeer, stream, peers, setRoomId } =
-    useContext(RoomContext);
+  const { currentPeer, stream, peers, setRoomId } = useContext(RoomContext);
 
   useEffect(() => {
     if (currentPeer) {
       webSocketClient.emit("join-room", { roomId, peerId: currentPeer._id });
     }
-  }, [roomId, currentPeer, webSocketClient]);
+  }, [roomId, currentPeer]);
 
   useEffect(() => {
     setRoomId(roomId || "");

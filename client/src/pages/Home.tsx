@@ -1,13 +1,13 @@
 import React, { useContext, useState } from "react";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
-import { RoomContext } from "../context/RoomContext";
 import { UserContext } from "../context/UserContext";
+import { webSocketClient } from "../webSocketClient";
 
 const Home = () => {
   const { userName, setUserName } = useContext(UserContext);
+  console.log("🚀 ~ file: Home.tsx:9 ~ Home ~ userName", userName);
   const [roomIdInput, setRoomIdInput] = useState<string>("");
-  const { webSocketClient } = useContext(RoomContext);
   const navigate = useNavigate();
 
   const handleOnCreate = () => {
@@ -38,6 +38,7 @@ const Home = () => {
                 <input
                   type="text"
                   id="name"
+                  value={userName}
                   autoComplete="do-not-autofill"
                   className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                   placeholder="Ex: Steve Jobs"

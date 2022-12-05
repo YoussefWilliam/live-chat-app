@@ -6,7 +6,6 @@ import React, {
   useContext,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import socketIOClient from "socket.io-client";
 import Peer from "peerjs";
 import { v4 as uuidV4 } from "uuid";
 import { peerReducer } from "../reducers/peerReducer";
@@ -15,25 +14,19 @@ import {
   addPeerNameAction,
   removePeerAction,
 } from "../reducers/peerActions";
-import { IMessage } from "../types/chat";
-import { chatReducer } from "../reducers/chatReducer";
-import { addHistoryAction, addMessageAction } from "../reducers/chatActions";
-import { UserContext } from "./UserContext";
 
-const WEB_SOCKET = "http://localhost:8080";
+import { UserContext } from "./UserContext";
+import { webSocketClient } from "../webSocketClient";
 
 export const RoomContext = createContext<null | any>(null);
-
-const webSocketClient = socketIOClient(WEB_SOCKET);
 
 export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   const navigate = useNavigate();
   const [currentPeer, setCurrentPeer] = useState<Peer>();
-  const { userId, userName } = useContext(UserContext);
+  const { userName } = useContext(UserContext);
   const [stream, setStream] = useState<MediaStream>();
   const [peers, peerDispatch] = useReducer(peerReducer, {});
-  const [chat, chatDispatch] = useReducer(chatReducer, { messages: [] });
-  const [roomId, setRoomId] = useState<string>("");
+  const [, setRoomId] = useState<string>("");
 
   const handleEnterRoom = ({ roomId }: { roomId: string }) => {
     navigate(`/room/${roomId}`);
@@ -51,32 +44,6 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
 
   const handleRemovePeers = (peerId: string) => {
     peerDispatch(removePeerAction(peerId));
-  };
-
-  const sendMessage = (message: string) => {
-    const messageData: IMessage = {
-      content: message,
-      author: userId,
-      name: userName,
-      timestamp: new Date()
-        .toTimeString()
-        .split(" ")[0]
-        .split(":")
-        .slice(0, 2)
-        .join(":"),
-    };
-
-    chatDispatch(addMessageAction(messageData));
-    webSocketClient.emit("send-message", roomId, messageData);
-  };
-
-  const handleAddMessage = (message: IMessage) => {
-    console.log({ message });
-    chatDispatch(addMessageAction(message));
-  };
-
-  const handleMessageHistory = (messages: Array<IMessage>) => {
-    chatDispatch(addHistoryAction(messages));
   };
 
   useEffect(() => {
@@ -99,17 +66,12 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     webSocketClient.on("room-created", handleEnterRoom);
     webSocketClient.on("get-users", handleGetUsers);
     webSocketClient.on("user-disconnected", handleRemovePeers);
-    webSocketClient.on("add-message", handleAddMessage);
-    webSocketClient.on("get-messages", (messages) =>
-      handleMessageHistory(messages)
-    );
 
     return () => {
       webSocketClient.off("room-created");
       webSocketClient.off("get-users");
       webSocketClient.off("user-disconnected");
       webSocketClient.off("user-joined");
-      webSocketClient.off("add-message");
     };
   }, []);
 
@@ -148,13 +110,10 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   return (
     <RoomContext.Provider
       value={{
-        webSocketClient,
         currentPeer,
         stream,
         peers,
         setRoomId,
-        sendMessage,
-        chat,
       }}
     >
       {children}

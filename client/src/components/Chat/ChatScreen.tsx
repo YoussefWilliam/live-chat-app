@@ -1,12 +1,13 @@
 import React, { useContext } from "react";
-import { RoomContext } from "../../context/RoomContext";
+import { ChatContext } from "../../context/ChatContext";
 
 import { IMessage } from "../../types/chat";
 import ChatBubble from "./ChatBubble";
 import ChatInput from "./ChatInput";
 
 const ChatScreen: React.FC = () => {
-  const { chat } = useContext(RoomContext);
+  const { chat } = useContext(ChatContext);
+  console.log("🚀 ~ file: ChatScreen.tsx:10 ~ chat", chat);
 
   return (
     <div className="flex flex-col h-full justify-between pb-20">
