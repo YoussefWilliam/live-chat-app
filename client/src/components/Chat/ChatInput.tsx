@@ -26,8 +26,8 @@ const ChatInput: React.FC = () => {
             onChange={(e) => setMessage(e.target.value)}
           />
 
-          <div className="border rounded-sm p-4">
-            <SendIcon />
+          <div className="p-4">
+            <SendIcon shouldSend={!!message} />
           </div>
         </div>
       </form>

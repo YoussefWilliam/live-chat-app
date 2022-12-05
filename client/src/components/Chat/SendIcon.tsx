@@ -1,9 +1,10 @@
 import React from "react";
+import cx from "classnames";
 
-const SendIcon: React.FC = () => (
+const SendIcon: React.FC<{ shouldSend: boolean }> = ({ shouldSend }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    fill="none"
+    fill={cx(shouldSend ? "green" : "none")}
     viewBox="0 0 24 24"
     stroke-width="1.5"
     stroke="currentColor"
