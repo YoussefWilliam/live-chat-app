@@ -5,6 +5,7 @@ import SendIcon from "./SendIcon";
 const ChatInput: React.FC = () => {
   const [message, setMessage] = useState<string>();
   const { sendMessage } = useContext(RoomContext);
+
   const handleOnSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (message?.length) {
@@ -15,7 +16,7 @@ const ChatInput: React.FC = () => {
   return (
     <div className="block w-full">
       <form onSubmit={(e) => handleOnSend(e)}>
-        <div className="flex flex-row px-2 fixed bottom-0">
+        <div className="flex flex-row px-2 fixed bottom-0 w-1/3">
           <input
             type="text"
             id="name"

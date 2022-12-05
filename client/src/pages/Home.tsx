@@ -36,6 +36,7 @@ const Home = () => {
             <div className="xl:ml-20 xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0">
               <div className="mb-6">
                 <input
+                  value={userName}
                   type="text"
                   id="name"
                   autoComplete="do-not-autofill"
