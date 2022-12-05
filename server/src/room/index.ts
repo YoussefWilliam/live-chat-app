@@ -39,7 +39,7 @@ export const roomHandler = (socket: Socket) => {
   };
 
   const sendMessage = (roomId: string, message: IMessage) => {
-    console.log("message");
+    console.log("message", message);
     if (chats[roomId]) {
       chats[roomId].push(message);
     } else {

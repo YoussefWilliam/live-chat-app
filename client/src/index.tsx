@@ -7,6 +7,7 @@ import { RoomProvider } from "../src/context/RoomContext";
 import Home from "./pages/Home";
 import Room from "./pages/Room";
 import { UserProvider } from "./context/UserContext";
+import { ChatProvider } from "./context/ChatContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -16,10 +17,12 @@ root.render(
     <BrowserRouter>
       <UserProvider>
         <RoomProvider>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/room/:id" element={<Room />} />
-          </Routes>
+          <ChatProvider>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/room/:id" element={<Room />} />
+            </Routes>
+          </ChatProvider>
         </RoomProvider>
       </UserProvider>
     </BrowserRouter>

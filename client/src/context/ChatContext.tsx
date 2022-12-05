@@ -3,12 +3,11 @@ import { addHistoryAction, addMessageAction } from "../reducers/chatActions";
 import { chatReducer, ChatState } from "../reducers/chatReducer";
 import { IMessage } from "../types/chat";
 import { webSocketClient } from "../webSocketClient";
-import { RoomContext } from "./RoomContext";
 import { UserContext } from "./UserContext";
 
 interface ChatContextProps {
   chat: ChatState;
-  sendMessage: (message: string) => void;
+  sendMessage: (message: string, roomId: string) => void;
 }
 
 export const ChatContext = createContext<ChatContextProps>({
@@ -21,9 +20,8 @@ export const ChatContext = createContext<ChatContextProps>({
 export const ChatProvider: React.FC<any> = ({ children }) => {
   const [chat, chatDispatch] = useReducer(chatReducer, { messages: [] });
   const { userId, userName } = useContext(UserContext);
-  const { roomId } = useContext(RoomContext);
 
-  const sendMessage = (message: string) => {
+  const sendMessage = (message: string, roomId: string) => {
     const messageData: IMessage = {
       content: message,
       author: userId,
@@ -51,11 +49,13 @@ export const ChatProvider: React.FC<any> = ({ children }) => {
 
   useEffect(() => {
     webSocketClient.on("add-message", handleAddMessage);
-    webSocketClient.on("get-messages", (messages) =>
-      handleMessageHistory(messages)
-    );
+    webSocketClient.on("get-messages", (messages) => {
+      handleMessageHistory(messages);
+      console.log("messssaaaggessss", messages);
+    });
     return () => {
       webSocketClient.off("add-message");
+      webSocketClient.off("get-messages");
     };
   }, []);
 

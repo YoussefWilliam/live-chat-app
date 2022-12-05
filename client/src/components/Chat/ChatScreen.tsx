@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { ChatContext } from "../../context/ChatContext";
 
 import { IMessage } from "../../types/chat";
@@ -9,12 +9,23 @@ const ChatScreen: React.FC = () => {
   const { chat } = useContext(ChatContext);
   console.log("🚀 ~ file: ChatScreen.tsx:10 ~ chat", chat);
 
+  const myLastMessageRef = useRef<null | HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    myLastMessageRef?.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chat]);
+
   return (
-    <div className="flex flex-col h-full justify-between pb-20">
-      <div className="overflow-y-scroll max-h-[800px]">
+    <div className="flex w-full flex-col h-[800px] justify-between pb-20">
+      <div className="overflow-y-scroll max-h-[800px]" id="chat-screen">
         {chat.messages.map((message: IMessage, i: number) => (
           <ChatBubble key={i} message={message} />
         ))}
+        <div ref={myLastMessageRef} id="lastMessageRef" />
       </div>
 
       <ChatInput />

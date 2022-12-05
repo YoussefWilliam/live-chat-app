@@ -1,21 +1,23 @@
 import React, { useContext, useState } from "react";
 import { ChatContext } from "../../context/ChatContext";
+import { RoomContext } from "../../context/RoomContext";
 import SendIcon from "./SendIcon";
 
 const ChatInput: React.FC = () => {
   const [message, setMessage] = useState<string>();
   const { sendMessage } = useContext(ChatContext);
+  const { roomId } = useContext(RoomContext);
   const handleOnSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (message?.length) {
-      sendMessage(message);
+      sendMessage(message, roomId);
       setMessage("");
     }
   };
   return (
     <div className="block w-full">
       <form onSubmit={(e) => handleOnSend(e)}>
-        <div className="flex flex-row px-2 fixed bottom-0">
+        <div className="flex flex-row px-2 fixed bottom-0 w-1/3">
           <input
             type="text"
             id="name"
@@ -25,8 +27,8 @@ const ChatInput: React.FC = () => {
             onChange={(e) => setMessage(e.target.value)}
           />
 
-          <div className="border rounded-sm p-4">
-            <SendIcon />
+          <div className="p-4">
+            <SendIcon shouldSend={!!message} />
           </div>
         </div>
       </form>
