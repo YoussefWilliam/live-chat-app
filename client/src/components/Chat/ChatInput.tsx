@@ -18,6 +18,7 @@ const ChatInput: React.FC = () => {
       <form onSubmit={(e) => handleOnSend(e)}>
         <div className="flex flex-row px-2 fixed bottom-0 w-1/3">
           <input
+            autoFocus
             type="text"
             id="name"
             value={message}
