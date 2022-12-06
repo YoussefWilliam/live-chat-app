@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  server:
+    build: ./server
+    container_name: server_container
+    ports:
+      - 8080:8080
+  client:
+    build: ./client
+    container_name: client_container
+    env_file:
+      - client/.env
+    ports:
+      - 3000:3000
