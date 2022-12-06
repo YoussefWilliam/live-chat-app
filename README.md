@@ -29,6 +29,16 @@ Don't worry, on we remember your name on joining again. If you used our applicat
 - [ReactJS](https://reactjs.org/) for our frontend application.
 - [Tailwind](https://tailwindcss.com/) for styling.
 
+## Run by docker
+
+If you have docker installed, run
+
+```bash
+  docker-compose up
+```
+
+### OR
+
 ## Run Locally
 
 Clone the project
@@ -77,12 +87,4 @@ Start the client
 
 ```bash
   yarn start
-```
-
-## Run by docker
-
-If you have docker installed, run
-
-```bash
-  docker-compose up
 ```
