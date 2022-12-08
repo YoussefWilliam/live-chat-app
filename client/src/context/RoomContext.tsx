@@ -11,7 +11,7 @@ import Peer from "peerjs";
 import { v4 as uuidV4 } from "uuid";
 import { peerReducer } from "../reducers/peerReducer";
 import {
-  addPeerAction,
+  addPeerStreamAction,
   addPeerNameAction,
   removePeerAction,
 } from "../reducers/peerActions";
@@ -37,16 +37,6 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
 
   const handleEnterRoom = ({ roomId }: { roomId: string }) => {
     navigate(`/room/${roomId}`);
-  };
-
-  const handleGetUsers = ({
-    roomId,
-    participants,
-  }: {
-    roomId: string;
-    participants: Array<string>;
-  }) => {
-    console.log({ participants });
   };
 
   const handleRemovePeers = (peerId: string) => {
@@ -97,7 +87,6 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
     }
 
     webSocketClient.on("room-created", handleEnterRoom);
-    webSocketClient.on("get-users", handleGetUsers);
     webSocketClient.on("user-disconnected", handleRemovePeers);
     webSocketClient.on("add-message", handleAddMessage);
     webSocketClient.on("get-messages", (messages) =>
@@ -106,7 +95,6 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
 
     return () => {
       webSocketClient.off("room-created");
-      webSocketClient.off("get-users");
       webSocketClient.off("user-disconnected");
       webSocketClient.off("user-joined");
       webSocketClient.off("add-message");
@@ -125,7 +113,7 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
         },
       });
       call.on("stream", (peerStream) => {
-        peerDispatch(addPeerAction(peerId, peerStream));
+        peerDispatch(addPeerStreamAction(peerId, peerStream));
       });
       peerDispatch(addPeerNameAction(peerId, name));
     });
@@ -136,7 +124,7 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
       peerDispatch(addPeerNameAction(call.peer, userName));
       call.answer(stream);
       call.on("stream", (peerStream) => {
-        peerDispatch(addPeerAction(call.peer, peerStream));
+        peerDispatch(addPeerStreamAction(call.peer, peerStream));
       });
     });
 

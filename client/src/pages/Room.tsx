@@ -14,9 +14,13 @@ const Room = () => {
 
   useEffect(() => {
     if (currentPeer) {
-      webSocketClient.emit("join-room", { roomId, peerId: currentPeer._id });
+      webSocketClient.emit("join-room", {
+        roomId,
+        peerId: currentPeer._id,
+        userName,
+      });
     }
-  }, [roomId, currentPeer, webSocketClient]);
+  }, [roomId, currentPeer, webSocketClient, userName]);
 
   useEffect(() => {
     setRoomId(roomId || "");
@@ -32,13 +36,13 @@ const Room = () => {
         <div className="grow w-2/3 grid gap-3 grid-cols-3">
           <div>
             <VideoPlayer stream={stream} />
-            <UserName name={userName} isMeTheSender={true} />
+            <UserName name={userName} isMeTheSender />
           </div>
 
           {Object.values(peers as PeerState).map((peer) => (
-            <div>
+            <div key={peer.peerId}>
               <VideoPlayer stream={peer.stream} />
-              <UserName name={peer.userName} isMeTheSender={false} />
+              <UserName name={peer.userName} />
             </div>
           ))}
         </div>

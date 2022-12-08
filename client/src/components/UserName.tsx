@@ -1,7 +1,7 @@
 import React from "react";
 import cx from "classnames";
 
-const UserName: React.FC<{ name: string; isMeTheSender: boolean }> = ({
+const UserName: React.FC<{ name: string; isMeTheSender?: boolean }> = ({
   name,
   isMeTheSender,
 }) => {
