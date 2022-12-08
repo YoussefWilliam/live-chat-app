@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useRef } from "react";
-import { RoomContext } from "../../context/RoomContext";
+import { ChatContext } from "../../context/ChatContext";
 
 import { IMessage } from "../../types/chat";
 import ChatBubble from "./ChatBubble";
 import ChatInput from "./ChatInput";
 
 const ChatScreen: React.FC = () => {
-  const { chat } = useContext(RoomContext);
+  const { chat } = useContext(ChatContext);
 
   const myLastMessageRef = useRef<null | HTMLDivElement>(null);
 

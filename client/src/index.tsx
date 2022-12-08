@@ -3,10 +3,9 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
-import { RoomProvider } from "../src/context/RoomContext";
-import Home from "./pages/Home";
-import Room from "./pages/Room";
-import { UserProvider } from "./context/UserContext";
+
+import { Home, Room } from "./pages";
+import { RoomProvider, ChatProvider, UserProvider } from "./context";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -18,7 +17,14 @@ root.render(
         <RoomProvider>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/room/:id" element={<Room />} />
+            <Route
+              path="/room/:id"
+              element={
+                <ChatProvider>
+                  <Room />
+                </ChatProvider>
+              }
+            />
           </Routes>
         </RoomProvider>
       </UserProvider>

@@ -1,15 +1,19 @@
 import React, { useContext, useState } from "react";
+import { ChatContext } from "../../context/ChatContext";
 import { RoomContext } from "../../context/RoomContext";
+import { UserContext } from "../../context/UserContext";
 import SendIcon from "./SendIcon";
 
 const ChatInput: React.FC = () => {
   const [message, setMessage] = useState<string>();
-  const { sendMessage } = useContext(RoomContext);
+  const { sendMessage } = useContext(ChatContext);
+  const { roomId } = useContext(RoomContext);
+  const { userId, userName } = useContext(UserContext);
 
   const handleOnSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (message?.length) {
-      sendMessage(message);
+      sendMessage(message, userId, userName, roomId);
       setMessage("");
     }
   };
