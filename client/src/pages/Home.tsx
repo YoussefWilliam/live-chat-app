@@ -1,13 +1,13 @@
 import React, { useContext, useState } from "react";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
-import { RoomContext } from "../context/RoomContext";
 import { UserContext } from "../context/UserContext";
+import { webSocketClient } from "../webSocket";
 
 const Home = () => {
   const { userName, setUserName } = useContext(UserContext);
   const [roomIdInput, setRoomIdInput] = useState<string>("");
-  const { webSocketClient } = useContext(RoomContext);
+
   const navigate = useNavigate();
 
   const handleOnCreate = () => {

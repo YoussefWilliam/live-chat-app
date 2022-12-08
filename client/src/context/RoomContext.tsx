@@ -19,12 +19,9 @@ import { IMessage } from "../types/chat";
 import { chatReducer } from "../reducers/chatReducer";
 import { addHistoryAction, addMessageAction } from "../reducers/chatActions";
 import { UserContext } from "./UserContext";
-
-const WEB_SOCKET = process.env.REACT_APP_WEB_SOCKET_URL;
+import { webSocketClient } from "../webSocket";
 
 export const RoomContext = createContext<null | any>(null);
-
-const webSocketClient = socketIOClient(WEB_SOCKET || "");
 
 export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
   const navigate = useNavigate();
