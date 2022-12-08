@@ -60,6 +60,7 @@ export const RoomProvider: React.FunctionComponent<any> = ({ children }) => {
       webSocketClient.off("user-disconnected");
       webSocketClient.off("user-joined");
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
