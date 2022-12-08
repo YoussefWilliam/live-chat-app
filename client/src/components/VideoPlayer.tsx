@@ -11,7 +11,7 @@ const VideoPlayer: React.FC<{ stream: MediaStream }> = ({ stream }) => {
       className="w-full shadow-lg border rounded-lg p-1"
       ref={videoRef}
       autoPlay
-      muted={true}
+      // muted={true} ** To disable audio **
     ></video>
   );
 };
